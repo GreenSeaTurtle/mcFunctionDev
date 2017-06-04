@@ -7,8 +7,7 @@ import (
 	"os"
 	"path"
 
-	//"github.com/benmcclelland/mcwaterfall/mcshapes"
-	"mcFunctionDev/mcshapes"
+	mcshapes "github.com/GreenSeaTurtle/mcFunctionDev/mcShapes"
 )
 
 //BuildWaterFalls builds n, s, e, w waterfalls
@@ -26,7 +25,7 @@ func BuildWaterFalls(basename string) error {
 
 		obj := mcshapes.NewMCObject(mcshapes.WithOrientation(direction))
 		wf := CreateWaterfall(origin, obj)
-		err = mcshapes.WriteBoxes(f, wf)
+		err = mcshapes.WriteShapes(f, wf)
 		if err != nil {
 			return fmt.Errorf("build waterfall: %v", err)
 		}
@@ -52,7 +51,7 @@ func BuildLavaFalls(basename string) error {
 			mcshapes.WithOrientation(direction),
 			mcshapes.WithType("lavafall"))
 		wf := CreateWaterfall(origin, obj)
-		err = mcshapes.WriteBoxes(f, wf)
+		err = mcshapes.WriteShapes(f, wf)
 		if err != nil {
 			return fmt.Errorf("build lavafall: %v", err)
 		}
@@ -69,9 +68,8 @@ func main() {
 	//flag.StringVar(&mcWorldFuncDir, "w", "mc", "Minecraft functions directory")
 	//flag.Parse()
 
-    mcSavesDir      =   "C:/Users/Chuck/AppData/Roaming/.minecraft/saves"
-    mcWorldFuncDir  =   "/Test 1p12pre7/data/functions/chuck"
-
+	mcSavesDir = "C:/Users/Chuck/AppData/Roaming/.minecraft/saves"
+	mcWorldFuncDir = "/Test 1p12pre7/data/functions/chuck"
 
 	fmt.Println(mcSavesDir)
 	fmt.Println(mcWorldFuncDir)

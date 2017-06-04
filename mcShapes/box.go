@@ -64,17 +64,15 @@ func (b *Box) Orient(direction string) {
 	}
 }
 
-//WriteBoxes writes out boxes in minecraft format
-func WriteBoxes(w io.Writer, boxes []*Box) error {
-	for _, b := range boxes {
-		s := fmt.Sprintf("fill ~%d ~%d ~%d ~%d ~%d ~%d %s\n",
-			b.corner1.X, b.corner1.Y, b.corner1.Z,
-			b.corner2.X, b.corner2.Y, b.corner2.Z,
-			b.surface)
-		_, err := w.Write([]byte(s))
-		if err != nil {
-			return err
-		}
+//WriteShape satisfies ObjectWriter interface
+func (b *Box) WriteShape(w io.Writer) error {
+	s := fmt.Sprintf("fill ~%d ~%d ~%d ~%d ~%d ~%d %s\n",
+		b.corner1.X, b.corner1.Y, b.corner1.Z,
+		b.corner2.X, b.corner2.Y, b.corner2.Z,
+		b.surface)
+	_, err := w.Write([]byte(s))
+	if err != nil {
+		return err
 	}
 	return nil
 }
