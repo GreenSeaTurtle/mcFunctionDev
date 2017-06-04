@@ -1,10 +1,17 @@
 package mcshapes
 
+import "io"
+
 //XYZ holds the x y and z locations
 type XYZ struct {
 	X int
 	Y int
 	Z int
+}
+
+//ObjectWriter interface to write out shape objects
+type ObjectWriter interface {
+	WriteShape(w io.Writer) error
 }
 
 //MCObject is the basic attributes of a minecraft object
@@ -70,18 +77,33 @@ func WithLocation(location XYZ) MCOption {
 	return func(m *MCObject) { m.location = location }
 }
 
+//Width of the MCObject
 func (m MCObject) Width() int {
 	return m.width
 }
 
+//Height of the MCObject
 func (m MCObject) Height() int {
 	return m.height
 }
 
+//Orientation of the MCObject
 func (m MCObject) Orientation() string {
 	return m.orientation
 }
 
+//OType is the type of object
 func (m MCObject) OType() string {
 	return m.oType
+}
+
+//WriteShapes writes out shapes in minecraft format
+func WriteShapes(w io.Writer, shapes []ObjectWriter) error {
+	for _, s := range shapes {
+		err := s.WriteShape(w)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

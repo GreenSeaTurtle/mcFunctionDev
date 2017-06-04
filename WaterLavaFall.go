@@ -1,10 +1,9 @@
 package main
 
-import "mcFunctionDev/mcshapes"
-//import "github.com/benmcclelland/mcwaterfall/mcshapes"
+import mcshapes "github.com/GreenSeaTurtle/mcFunctionDev/mcShapes"
 
 //CreateWaterfall creates a water at origin with attributes
-func CreateWaterfall(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
+func CreateWaterfall(origin mcshapes.XYZ, o *mcshapes.MCObject) []mcshapes.ObjectWriter {
 	b := CreateBasin(origin, o)
 	b = append(b, CreateSideWall(origin, o, "left")...)
 	b = append(b, CreateSideWall(origin, o, "right")...)
@@ -19,7 +18,7 @@ func CreateWaterfall(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box 
 }
 
 //CreateBasin creates the basin
-func CreateBasin(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
+func CreateBasin(origin mcshapes.XYZ, o *mcshapes.MCObject) []mcshapes.ObjectWriter {
 	xyz := mcshapes.XYZ{X: origin.X + o.Width() - 1, Y: origin.Y, Z: origin.Z}
 	b1 := mcshapes.NewBox(
 		mcshapes.WithCorner1(origin),
@@ -34,11 +33,11 @@ func CreateBasin(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
 	b3 := mcshapes.NewBox(mcshapes.WithCorner1(xyz), mcshapes.WithCorner2(xyz))
 	b3.Orient(o.Orientation())
 
-	return append([]*mcshapes.Box{}, b1, b2, b3)
+	return append([]mcshapes.ObjectWriter{}, b1, b2, b3)
 }
 
 //CreateSideWall creates either left or right side wall
-func CreateSideWall(origin mcshapes.XYZ, o *mcshapes.MCObject, side string) []*mcshapes.Box {
+func CreateSideWall(origin mcshapes.XYZ, o *mcshapes.MCObject, side string) []mcshapes.ObjectWriter {
 	var x int
 	switch side {
 	case "left":
@@ -63,12 +62,12 @@ func CreateSideWall(origin mcshapes.XYZ, o *mcshapes.MCObject, side string) []*m
 		mcshapes.WithSurface("minecraft:stone 4"))
 	b2.Orient(o.Orientation())
 
-	return append([]*mcshapes.Box{}, b1, b2)
+	return append([]mcshapes.ObjectWriter{}, b1, b2)
 }
 
 //CreateBackWall creates the back wall
-func CreateBackWall(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
-	xyz1 := mcshapes.XYZ{X: origin.X,                 Y: origin.Y + o.Height(),     Z: origin.Z - 4}
+func CreateBackWall(origin mcshapes.XYZ, o *mcshapes.MCObject) []mcshapes.ObjectWriter {
+	xyz1 := mcshapes.XYZ{X: origin.X, Y: origin.Y + o.Height(), Z: origin.Z - 4}
 	xyz2 := mcshapes.XYZ{X: origin.X + o.Width() - 2, Y: origin.Y + o.Height() - 3, Z: origin.Z - 4}
 	b := mcshapes.NewBox(
 		mcshapes.WithCorner1(xyz1),
@@ -76,11 +75,11 @@ func CreateBackWall(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
 		mcshapes.WithSurface("minecraft:stone 4"))
 	b.Orient(o.Orientation())
 
-	return append([]*mcshapes.Box{}, b)
+	return append([]mcshapes.ObjectWriter{}, b)
 }
 
 //CreateBottom creates the bottom of the falls
-func CreateBottom(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
+func CreateBottom(origin mcshapes.XYZ, o *mcshapes.MCObject) []mcshapes.ObjectWriter {
 	xyz1 := mcshapes.XYZ{X: origin.X + 1, Y: origin.Y + o.Height() - 3, Z: origin.Z - 3}
 	xyz2 := mcshapes.XYZ{X: origin.X + o.Width() - 2, Y: origin.Y + o.Height() - 3, Z: origin.Z - 3}
 	b := mcshapes.NewBox(
@@ -89,21 +88,21 @@ func CreateBottom(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
 		mcshapes.WithSurface("minecraft:stone 4"))
 	b.Orient(o.Orientation())
 
-	return append([]*mcshapes.Box{}, b)
+	return append([]mcshapes.ObjectWriter{}, b)
 }
 
 //CreateFrontWall creates the front wall for the water to cascade down
-func CreateFrontWall(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
+func CreateFrontWall(origin mcshapes.XYZ, o *mcshapes.MCObject) []mcshapes.ObjectWriter {
 	xyz1 := mcshapes.XYZ{X: origin.X + 1, Y: origin.Y, Z: origin.Z - 2}
 	xyz2 := mcshapes.XYZ{X: origin.X + o.Width() - 2, Y: origin.Y + o.Height() - 1, Z: origin.Z - 2}
 	b := mcshapes.NewBox(mcshapes.WithCorner1(xyz1), mcshapes.WithCorner2(xyz2))
 	b.Orient(o.Orientation())
 
-	return append([]*mcshapes.Box{}, b)
+	return append([]mcshapes.ObjectWriter{}, b)
 }
 
 //CreateHeater lava is needed to prevent freezing
-func CreateHeater(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
+func CreateHeater(origin mcshapes.XYZ, o *mcshapes.MCObject) []mcshapes.ObjectWriter {
 	xyz1 := mcshapes.XYZ{X: origin.X + 1, Y: origin.Y + o.Height() - 2, Z: origin.Z - 3}
 	xyz2 := mcshapes.XYZ{X: origin.X + o.Width() - 2, Y: origin.Y + o.Height() - 2, Z: origin.Z - 3}
 	b := mcshapes.NewBox(
@@ -112,11 +111,11 @@ func CreateHeater(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
 		mcshapes.WithSurface("minecraft:flowing_lava"))
 	b.Orient(o.Orientation())
 
-	return append([]*mcshapes.Box{}, b)
+	return append([]mcshapes.ObjectWriter{}, b)
 }
 
 //CreateHeatExchanger protects the lava from the water
-func CreateHeatExchanger(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
+func CreateHeatExchanger(origin mcshapes.XYZ, o *mcshapes.MCObject) []mcshapes.ObjectWriter {
 	xyz1 := mcshapes.XYZ{X: origin.X + 1, Y: origin.Y + o.Height() - 1, Z: origin.Z - 3}
 	xyz2 := mcshapes.XYZ{X: origin.X + o.Width() - 2, Y: origin.Y + o.Height() - 1, Z: origin.Z - 3}
 	b := mcshapes.NewBox(
@@ -125,11 +124,11 @@ func CreateHeatExchanger(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.
 		mcshapes.WithSurface("minecraft:glass"))
 	b.Orient(o.Orientation())
 
-	return append([]*mcshapes.Box{}, b)
+	return append([]mcshapes.ObjectWriter{}, b)
 }
 
 //CreateFalls creates either the lava or water falls
-func CreateFalls(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
+func CreateFalls(origin mcshapes.XYZ, o *mcshapes.MCObject) []mcshapes.ObjectWriter {
 	var surface string
 	switch o.OType() {
 	case "waterfall":
@@ -146,5 +145,5 @@ func CreateFalls(origin mcshapes.XYZ, o *mcshapes.MCObject) []*mcshapes.Box {
 		mcshapes.WithSurface(surface))
 	b.Orient(o.Orientation())
 
-	return append([]*mcshapes.Box{}, b)
+	return append([]mcshapes.ObjectWriter{}, b)
 }
