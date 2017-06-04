@@ -1,4 +1,4 @@
-# mc_function_dev
+# mcFunctionDev
 Minecraft function development using golang
 
 As of Minecraft version 1.12 (anticipated to be released on June 2,
