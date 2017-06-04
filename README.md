@@ -19,4 +19,6 @@ The development language for this project is golang, partly because it
 is a great, modern language and partly because this project is an easy
 way of learning the language basics.
 
+Example 1:
+
 ![alt text](waterfall_01.png)
