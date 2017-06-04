@@ -21,4 +21,6 @@ way of learning the language basics.
 
 Example 1:
 
+This is an example
+
 ![alt text](waterfall_01.png)
