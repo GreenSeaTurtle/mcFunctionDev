@@ -2,7 +2,7 @@ package main
 
 import mcshapes "github.com/GreenSeaTurtle/mcFunctionDev/mcShapes"
 
-//CreateWaterfall creates a water at origin with attributes
+//CreateWaterfall creates a water or lava fall at the origin with attributes
 func CreateWaterfall(origin mcshapes.XYZ, o *mcshapes.MCObject) []mcshapes.ObjectWriter {
 	b := CreateBasin(origin, o)
 	b = append(b, CreateSideWall(origin, o, "left")...)
