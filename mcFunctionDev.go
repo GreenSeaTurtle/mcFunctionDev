@@ -12,7 +12,7 @@ import (
 )
 
 // mcFunctionPath struct for reading various things from the init file
-// Note that fields must start with a capital letter!!!!
+// Note that fields must start with a capital letter!!!!!!
 type mcFunctionPath struct {
 	Title          string
 	MCSavesDir     string `toml:"mc_saves_dir"`

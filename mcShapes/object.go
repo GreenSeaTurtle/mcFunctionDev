@@ -2,7 +2,7 @@ package mcshapes
 
 import "io"
 
-// XYZ holds the x y and z locations
+// XYZ holds the x, y, and z locations
 type XYZ struct {
 	X int
 	Y int

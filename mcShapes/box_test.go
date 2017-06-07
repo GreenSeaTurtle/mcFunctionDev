@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// Test a north box
 func TestNorthBox(t *testing.T) {
 	expected := "fill ~1 ~2 ~3 ~4 ~5 ~6 testsurface\n"
 	b := NewBox(
