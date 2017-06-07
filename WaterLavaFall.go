@@ -48,9 +48,7 @@ func CreateSideWall(origin mcshapes.XYZ, o *mcshapes.MCObject, side string) []mc
 
 	xyz1 := mcshapes.XYZ{X: x, Y: origin.Y, Z: origin.Z - 2}
 	xyz2 := mcshapes.XYZ{X: x, Y: origin.Y + o.Height(), Z: origin.Z - 2}
-	b1 := mcshapes.NewBox(
-		mcshapes.WithCorner1(xyz1),
-		mcshapes.WithCorner2(xyz2),
+	b1 := mcshapes.NewBox(mcshapes.WithCorner1(xyz1), mcshapes.WithCorner2(xyz2),
 		mcshapes.WithSurface("minecraft:stone 4"))
 	b1.Orient(o.Orientation())
 
