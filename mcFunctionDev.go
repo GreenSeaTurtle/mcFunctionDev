@@ -7,42 +7,40 @@ import (
 	"os"
 	"path"
 
+	"github.com/BurntSushi/toml"
 	mcshapes "github.com/GreenSeaTurtle/mcFunctionDev/mcShapes"
-    "github.com/BurntSushi/toml"
 )
 
 // mcFunctionPath struct for reading various things from the init file
 // Note that fields must start with a capital letter!!!
 type mcFunctionPath struct {
-    Title           string
-    MCSavesDir      string `toml:"mc_saves_dir"`
-    MCFunctionsDir  string `toml:"mc_world_functions_dir"`
+	Title          string
+	MCSavesDir     string `toml:"mc_saves_dir"`
+	MCFunctionsDir string `toml:"mc_world_functions_dir"`
 }
 
-
-
 func main() {
-    // Read and extract information from the init file.  Right now, the
-    // only information in the init file is the path to the Minecraft
-    // functions directory on this system.  The waterfall files are
-    // written directly to the game directory which saves time and hassle
-    // of copying files.  The path is split into two strings just because
-    // it is typically a long path.
-    //
-    // The TOML package is used to read and parse the init file.
-    //    github.com/BurntSushi/toml
-    //
-    gopath := os.Getenv("GOPATH")
-    infile := gopath + "/mc_function_dev.init"
-    //fmt.Println("infile = " + infile)
-    var config mcFunctionPath
-    if _, err := toml.DecodeFile(infile, &config); err != nil {
-        fmt.Println(err)
-        return
-    }
-    //fmt.Printf("Title: %s\n", config.Title)
-    //fmt.Printf("mc_saves_dir: %s\n", config.MCSavesDir)
-    //fmt.Println("mc_world_functions_dir = " + config.MCFunctionsDir)
+	// Read and extract information from the init file.  Right now, the
+	// only information in the init file is the path to the Minecraft
+	// functions directory on this system.  The waterfall files are
+	// written directly to the game directory which saves time and hassle
+	// of copying files.  The path is split into two strings just because
+	// it is typically a long path.
+	//
+	// The TOML package is used to read and parse the init file.
+	//    github.com/BurntSushi/toml
+	//
+	gopath := os.Getenv("GOPATH")
+	infile := gopath + "/mc_function_dev.init"
+	//fmt.Println("infile = " + infile)
+	var config mcFunctionPath
+	if _, err := toml.DecodeFile(infile, &config); err != nil {
+		fmt.Println(err)
+		return
+	}
+	//fmt.Printf("Title: %s\n", config.Title)
+	//fmt.Printf("mc_saves_dir: %s\n", config.MCSavesDir)
+	//fmt.Println("mc_world_functions_dir = " + config.MCFunctionsDir)
 
 	// Keep this for now as an example of how to get and process
 	// execution line arguments.
@@ -51,7 +49,7 @@ func main() {
 	//flag.Parse()
 
 	basepath := path.Join(config.MCSavesDir, config.MCFunctionsDir)
-    //fmt.Println("basepath = " + basepath)
+	//fmt.Println("basepath = " + basepath)
 	err := BuildWaterFalls(basepath)
 	if err != nil {
 		log.Fatalln(err)
@@ -67,7 +65,6 @@ func main() {
 		log.Fatalln(err)
 	}
 }
-
 
 //BuildWaterFalls builds n, s, e, w waterfalls
 func BuildWaterFalls(basepath string) error {
@@ -119,7 +116,6 @@ func BuildLavaFalls(basepath string) error {
 	return nil
 }
 
-
 //BuildRollerCoasterFalls builds two falls next to each other separated by only one
 // block. It adds redstone and track to make it a roller coaster ride.
 func BuildRollerCoasterFalls(basepath string) error {
@@ -156,12 +152,12 @@ func BuildRollerCoasterFalls(basepath string) error {
 		return fmt.Errorf("build waterfall rc south fall: %v", err)
 	}
 
-    // At this point we have two waterfalls facing each other, separated by one row of blocks,
+	// At this point we have two waterfalls facing each other, separated by one row of blocks,
 	// i.e. the front of the basin which defaults to sandstone.
-    // Change those blocks to be redstone in preparation for putting tracks on them.
+	// Change those blocks to be redstone in preparation for putting tracks on them.
 	// Replace the sandstone with redstone to power the rails.
 	width := 102
-	corner1 := mcshapes.XYZ{X: origin.X,             Y: origin.Y, Z: origin.Z - 4}
+	corner1 := mcshapes.XYZ{X: origin.X, Y: origin.Y, Z: origin.Z - 4}
 	corner2 := mcshapes.XYZ{X: origin.X + width - 1, Y: origin.Y, Z: origin.Z - 4}
 	b := mcshapes.NewBox(mcshapes.WithCorner1(corner1), mcshapes.WithCorner2(corner2),
 		mcshapes.WithSurface("minecraft:redstone_block"))
