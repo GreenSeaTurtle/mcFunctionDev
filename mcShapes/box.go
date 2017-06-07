@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-// Box is a 3D rectangle of blocks (also 1D and 2D)
+// Box is a 3D rectangle of blocks (also in 1D and 2D)
 // The edge lengths of a Box do not have to be equal.
 // All blocks within a Box have to be of the same type.
 // The Box geometry is fully specified with the XYZ coordinates of two
