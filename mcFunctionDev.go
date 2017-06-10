@@ -64,6 +64,16 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	err = rmFalls(basepath)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	err = ClearForWall(basepath)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 //BuildWaterFalls builds n, s, e, w waterfalls
@@ -174,6 +184,84 @@ func BuildRollerCoasterFalls(basepath string) error {
 	err = b.WriteShape(f)
 	if err != nil {
 		return fmt.Errorf("build waterfall rc track: %v", err)
+	}
+
+	return nil
+}
+
+// rmFalls removes north, south, east, west waterfalls
+// After placing a water or lava fall somewhere in the Minecraft game, it is sometimes
+// necessary to remove it. Perhaps, for example, it was placed in the wrong location and
+// needs to be moved. This function writes out a Minecraft function to do this using the
+// Minecraft fill command.
+// An example of this command is:
+//    fill ~0 ~0 ~-2 ~101 ~30 ~-6 minecraft:air
+// The ~ refers to the players current position in the game.
+// Yes, a fall could be removed by hand inside the game, but this is very tedious, thus
+// the need for this function.
+func rmFalls(basepath string) error {
+	origin := mcshapes.XYZ{X: 0, Y: 0, Z: -2}
+
+	for _, direction := range []string{"north", "east", "south", "west"} {
+		// Minecraft functions must have a suffix of ".mcfunction"
+		fname := path.Join(basepath, "rm_fall_"+direction) + ".mcfunction"
+		f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+		if err != nil {
+			return fmt.Errorf("rm_fall open %v: %v", fname, err)
+		}
+		defer f.Close()
+
+		width := 100
+		height := 30
+		// Use a loop because Minecraft has a limit on total number of blocks per fill command.
+		for h := 0; h <= height; h++ {
+			corner1 := mcshapes.XYZ{X: origin.X, Y: origin.Y + h, Z: origin.Z}
+			corner2 := mcshapes.XYZ{X: origin.X + width - 1, Y: origin.Y + h, Z: origin.Z - 4}
+			b := mcshapes.NewBox(mcshapes.WithCorner1(corner1), mcshapes.WithCorner2(corner2),
+				mcshapes.WithSurface("minecraft:air"))
+			b.Orient(direction)
+			err = b.WriteShape(f)
+			if err != nil {
+				return fmt.Errorf("rm fall: %v", err)
+			}
+		}
+	}
+
+	return nil
+}
+
+// ClearForWall
+func ClearForWall(basepath string) error {
+	origin := mcshapes.XYZ{X: 0, Y: 0, Z: -2}
+
+	for _, direction := range []string{"north", "east", "south", "west"} {
+		// Minecraft functions must have a suffix of ".mcfunction"
+		fname := path.Join(basepath, "ClearForWall_"+direction) + ".mcfunction"
+		f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+		if err != nil {
+			return fmt.Errorf("rm_fall open %v: %v", fname, err)
+		}
+		defer f.Close()
+
+		width := 100
+		height := 50
+		depth := 17
+		// Use a loop because Minecraft has a limit on total number of blocks per fill command.
+		for h := -1; h <= height; h++ {
+			corner1 := mcshapes.XYZ{X: origin.X, Y: origin.Y + h, Z: origin.Z}
+			corner2 := mcshapes.XYZ{X: origin.X + width - 1, Y: origin.Y + h, Z: origin.Z - depth + 1}
+			block_type := "air"
+			if h == -1 {
+				block_type = "sea_lantern"
+			}
+			b := mcshapes.NewBox(mcshapes.WithCorner1(corner1), mcshapes.WithCorner2(corner2),
+				mcshapes.WithSurface("minecraft:"+block_type))
+			b.Orient(direction)
+			err = b.WriteShape(f)
+			if err != nil {
+				return fmt.Errorf("ClearForWall: %v", err)
+			}
+		}
 	}
 
 	return nil

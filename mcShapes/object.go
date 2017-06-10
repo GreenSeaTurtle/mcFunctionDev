@@ -27,7 +27,7 @@ type MCObject struct {
 func NewMCObject(opts ...MCOption) *MCObject {
 	m := &MCObject{
 		//default width is 102
-		width: 102,
+		width: 100,
 		//default height is 30
 		height: 30,
 		//default orientation is north

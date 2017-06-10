@@ -49,6 +49,10 @@ func WithCorner2(xyz XYZ) BoxOption {
 }
 
 // Orient box to new direction
+// North fall runs west to east
+// East fall runs north to south
+// South fall runs west to east
+// West fall runs north to south
 func (b *Box) Orient(direction string) {
 	switch direction {
 	case "north":
