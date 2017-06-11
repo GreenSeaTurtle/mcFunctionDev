@@ -3,7 +3,7 @@ Minecraft function development using golang
 
 <br>
 
-### About
+## About
 
 As of Minecraft version 1.12 (released on June 7, 2017) external
 function files can be input to Minecraft providing a list of commands
@@ -39,9 +39,9 @@ mcFunctionDev is run and produces Minecraft function files to generate
 the waterfall in various orientations. An example of such a function
 file that essentially produces the waterfall above is:
 
-fill ~0 ~0 ~-2 ~99 ~0 ~-2 minecraft:sandstone
-fill ~0 ~0 ~-3 ~0 ~0 ~-3 minecraft:sandstone
-fill ~99 ~0 ~-3 ~99 ~0 ~-3 minecraft:sandstone
+fill ~0 ~0 ~-2 ~99 ~0 ~-2 minecraft:sandstone  
+fill ~0 ~0 ~-3 ~0 ~0 ~-3 minecraft:sandstone  
+fill ~99 ~0 ~-3 ~99 ~0 ~-3 minecraft:sandstone  
 fill ~0 ~0 ~-4 ~0 ~30 ~-4 minecraft:stone 4
 fill ~0 ~27 ~-6 ~0 ~30 ~-5 minecraft:stone 4
 fill ~99 ~0 ~-4 ~99 ~30 ~-4 minecraft:stone 4
@@ -58,8 +58,8 @@ east. Function files for "east", "south", and "west" waterfalls are
 also produced. Additional function files are generated that replace
 the water with lava producing lavafalls.
 
-The "~" symbol in the above function file refers to the player's
-current position in the game. The number after the "~" gets added to
+The "\~" symbol in the above function file refers to the player's
+current position in the game. The number after the "\~" gets added to
 the players position to generate x, y, and z coordinates for two
 corners that define the fill box. The box is filled with blocks with a
 type specified by the last argument to the fill command, for example
@@ -69,8 +69,8 @@ A minor point is that extra spaces are not allowed in these
 fill commands. This perhaps will be fixed in some future
 version of Minecraft. For example, the two commands
 
-fill ~0 ~0 ~-2 ~99 ~0 ~-2 minecraft:sandstone
-fill ~0 ~0 ~-2   ~99 ~0 ~-2   minecraft:sandstone
+  fill ~0 ~0 ~-2 ~99 ~0 ~-2 minecraft:sandstone
+  fill ~0 ~0 ~-2   ~99 ~0 ~-2   minecraft:sandstone
 
 would seem to be identical, ignoring the extra white space, but the
 second command, with the additional white space, fails.
