@@ -230,7 +230,20 @@ func rmFalls(basepath string) error {
 	return nil
 }
 
-// ClearForWall
+
+// ClearForWall - clear space for a wal
+// A wall in this context is meant to surround some area, such as a Mincraft village, and
+// provides protection from Minecraft Hostile Mobs (zombies, creeper, spiders, ...). The wall
+// should be at least 3 blocks high and it needs an overhang to keep the spiders out (spiders
+// can crawl up a wall but cannot get past a ledge). The area inside the wall needs to be lit
+// up so Hostile Mobs will not spawn. There needs to be clear space on the outside of the wall
+// so the Hostile Mobs will not be able to jump to the top of the wall and thus into the secure
+// area. Space is also left on the inside of the wall so villagers will not accidentally find
+// their way outside the wall.
+// The lava and water falls provide and excellent wall. Such falls are tall enough and come
+// with a ledge on the outside. They are also visually stunning.
+// This function clears space for the wall. The width, height, and depth parameters specify the
+// extent of the cleared area. The wall is put in the middle of the cleared area. 
 func ClearForWall(basepath string) error {
 	origin := mcshapes.XYZ{X: 0, Y: 0, Z: -2}
 
@@ -243,9 +256,13 @@ func ClearForWall(basepath string) error {
 		}
 		defer f.Close()
 
+		// Minecraft will not accept a width that is too large. 150 is too large, 100 works.
+		// Probably has something to do with the size of Minecraft chunks and how many chunks
+		// are active and/or being visualized.
 		width := 100
 		height := 50
 		depth := 17
+
 		// Use a loop because Minecraft has a limit on total number of blocks per fill command.
 		for h := -1; h <= height; h++ {
 			corner1 := mcshapes.XYZ{X: origin.X, Y: origin.Y + h, Z: origin.Z}
@@ -266,3 +283,4 @@ func ClearForWall(basepath string) error {
 
 	return nil
 }
+
