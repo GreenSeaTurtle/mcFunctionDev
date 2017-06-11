@@ -48,6 +48,14 @@ func WithCorner2(xyz XYZ) BoxOption {
 	return func(b *Box) { b.corner2 = xyz }
 }
 
+// At sets the location for a single voxel box
+func At(xyz XYZ) BoxOption {
+	return func(b *Box) {
+		b.corner1 = xyz
+		b.corner2 = xyz
+	}
+}
+
 // Orient box to new direction
 // North fall runs west to east
 // East fall runs north to south
