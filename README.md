@@ -67,13 +67,7 @@ sandstone, lava, glass, etc.
 
 A minor point is that extra spaces are not allowed in these
 fill commands. This perhaps will be fixed in some future
-version of Minecraft. For example, the two commands
-
-  fill ~0 ~0 ~-2 ~99 ~0 ~-2 minecraft:sandstone  
-  fill ~0 ~0 ~-2 \ \   ~99 ~0 ~-2 \ \   minecraft:sandstone
-
-would seem to be identical, ignoring the extra white space, but the
-second command, with the additional white space, fails.
+version of Minecraft.
 
 It may seem odd that the waterfall above has lava in it. At higher
 elevation and with a waterfall that is tall enough, the water at the
