@@ -70,7 +70,7 @@ fill commands. This perhaps will be fixed in some future
 version of Minecraft. For example, the two commands
 
   fill ~0 ~0 ~-2 ~99 ~0 ~-2 minecraft:sandstone  
-  fill ~0 ~0 ~-2   ~99 ~0 ~-2   minecraft:sandstone
+  fill ~0 ~0 ~-2 \ \   ~99 ~0 ~-2 \ \   minecraft:sandstone
 
 would seem to be identical, ignoring the extra white space, but the
 second command, with the additional white space, fails.

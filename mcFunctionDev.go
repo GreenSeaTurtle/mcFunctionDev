@@ -74,6 +74,16 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	err = CreateSphere(basepath, 20, "glass", "lava")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = CreateSphere(basepath, 20, "sea_lantern", "nothing")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 }
 
 //BuildWaterFalls builds n, s, e, w waterfalls
@@ -240,7 +250,7 @@ func rmFalls(basepath string) error {
 // so the Hostile Mobs will not be able to jump to the top of the wall and thus into the secure
 // area. Space is also left on the inside of the wall so villagers will not accidentally find
 // their way outside the wall.
-// The lava and water falls provide and excellent wall. Such falls are tall enough and come
+// The lava and water falls provide an excellent wall. Such falls are tall enough and come
 // with a ledge on the outside. They are also visually stunning.
 // This function clears space for the wall. The width, height, and depth parameters specify the
 // extent of the cleared area. The wall is put in the middle of the cleared area. 
@@ -279,6 +289,38 @@ func ClearForWall(basepath string) error {
 				return fmt.Errorf("ClearForWall: %v", err)
 			}
 		}
+	}
+
+	return nil
+}
+
+
+
+
+// CreateSphere
+func CreateSphere(basepath string, radius int, exteriorBlockType string,
+	              interiorBlockType string) error {
+	center := mcshapes.XYZ{X: radius, Y: 0, Z: radius+2}
+
+	// Minecraft functions must have a suffix of ".mcfunction"
+	srad := fmt.Sprintf("%d", radius)
+	blkname := exteriorBlockType
+	if interiorBlockType != "nothing" {
+		blkname = exteriorBlockType + "_" + interiorBlockType
+	}
+	fname := basepath + "/Sphere_" + blkname + "_" + srad + ".mcfunction"
+	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+	if err != nil {
+		return fmt.Errorf("CreateSphere open %v: %v", fname, err)
+	}
+	defer f.Close()
+
+	b := mcshapes.NewSphere(mcshapes.WithRadius(radius), mcshapes.WithCenter(center),
+		mcshapes.WithSphereSurface("minecraft:" + exteriorBlockType),
+		mcshapes.WithSphereInteriorSurface("minecraft:" + interiorBlockType))
+	err = b.WriteShape(f)
+	if err != nil {
+		return fmt.Errorf("ClearForWall: %v", err)
 	}
 
 	return nil
