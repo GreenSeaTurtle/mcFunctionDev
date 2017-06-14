@@ -13,6 +13,9 @@ import (
 
 // mcFunctionPath struct for reading various things from the init file
 // Note that fields must start with a capital letter!!!!!!
+// Example:
+//    MCSavesDir - this is what TOML uses below to reference the user input.
+//    mc_saves_dir - this is what appears in the init file
 type mcFunctionPath struct {
 	Title          string
 	MCSavesDir     string `toml:"mc_saves_dir"`
@@ -20,27 +23,34 @@ type mcFunctionPath struct {
 }
 
 func main() {
-	// Read and extract information from the init file.  Right now, the
-	// only information in the init file is the path to the Minecraft
-	// functions directory on this system.  The waterfall files are
-	// written directly to the game directory which saves time and hassle
-	// of copying files.  The path is split into two strings just because
-	// it is typically a long path.
+	// mcFunctionDev uses two control files, init and input.
+	//    init file - sets things that do not change often
+	//    input file - controls what mcFunctionDev does when executed
+
 	//
-	// The TOML package is used to read and parse the init file.
+	// The TOML package is used to read and parse both the init file
+	// and the input file.
 	//    github.com/BurntSushi/toml
 	//
+
+	// Read and extract information from the init file.
+	//
+	// Right now, the only information in the init file is the path to
+	// the Minecraft functions directory on this system.  The
+	// output function files are written directly to the game directory
+	// which saves time and hassle of copying files.  The path is
+	// split into two strings just because it is typically a long path.
 	gopath := os.Getenv("GOPATH")
-	infile := gopath + "/mc_function_dev.init"
-	//fmt.Println("infile = " + infile)
-	var config mcFunctionPath
-	if _, err := toml.DecodeFile(infile, &config); err != nil {
+	initfile := gopath + "/mcFunctionDev.init"
+	//fmt.Println("initfile = " + initfile)
+	var mcwpath mcFunctionPath
+	if _, err := toml.DecodeFile(initfile, &mcwpath); err != nil {
 		fmt.Println(err)
 		return
 	}
-	//fmt.Printf("Title: %s\n", config.Title)
-	//fmt.Printf("mc_saves_dir: %s\n", config.MCSavesDir)
-	//fmt.Println("mc_world_functions_dir = " + config.MCFunctionsDir)
+	//fmt.Printf("Title: %s\n", mcwpath.Title)
+	//fmt.Printf("mc_saves_dir: %s\n", mcwpath.MCSavesDir)
+	//fmt.Println("mc_world_functions_dir = " + mcwpath.MCFunctionsDir)
 
 	// Keep this for now as an example of how to get and process
 	// execution line arguments.
@@ -48,7 +58,10 @@ func main() {
 	//flag.StringVar(&mcWorldFuncDir, "w", "mc", "Minecraft functions directory")
 	//flag.Parse()
 
-	basepath := path.Join(config.MCSavesDir, config.MCFunctionsDir)
+	inputFile := "all.input"
+	basepath := path.Join(mcwpath.MCSavesDir, mcwpath.MCFunctionsDir)
+
+
 	//fmt.Println("basepath = " + basepath)
 	err := BuildWaterFalls(basepath)
 	if err != nil {
@@ -75,15 +88,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	err = CreateSphere(basepath, 20, "glass", "lava")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	err = CreateSphere(basepath, 20, "sea_lantern", "nothing")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
+	CreateSphereDriver(inputFile, basepath)
 }
 
 //BuildWaterFalls builds n, s, e, w waterfalls
@@ -240,7 +245,6 @@ func rmFalls(basepath string) error {
 	return nil
 }
 
-
 // ClearForWall - clear space for a wal
 // A wall in this context is meant to surround some area, such as a Mincraft village, and
 // provides protection from Minecraft Hostile Mobs (zombies, creeper, spiders, ...). The wall
@@ -253,7 +257,7 @@ func rmFalls(basepath string) error {
 // The lava and water falls provide an excellent wall. Such falls are tall enough and come
 // with a ledge on the outside. They are also visually stunning.
 // This function clears space for the wall. The width, height, and depth parameters specify the
-// extent of the cleared area. The wall is put in the middle of the cleared area. 
+// extent of the cleared area. The wall is put in the middle of the cleared area.
 func ClearForWall(basepath string) error {
 	origin := mcshapes.XYZ{X: 0, Y: 0, Z: -2}
 
@@ -289,38 +293,6 @@ func ClearForWall(basepath string) error {
 				return fmt.Errorf("ClearForWall: %v", err)
 			}
 		}
-	}
-
-	return nil
-}
-
-
-
-
-// CreateSphere
-func CreateSphere(basepath string, radius int, exteriorBlockType string,
-	              interiorBlockType string) error {
-	center := mcshapes.XYZ{X: radius, Y: 0, Z: radius+2}
-
-	// Minecraft functions must have a suffix of ".mcfunction"
-	srad := fmt.Sprintf("%d", radius)
-	blkname := exteriorBlockType
-	if interiorBlockType != "nothing" {
-		blkname = exteriorBlockType + "_" + interiorBlockType
-	}
-	fname := basepath + "/Sphere_" + blkname + "_" + srad + ".mcfunction"
-	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
-	if err != nil {
-		return fmt.Errorf("CreateSphere open %v: %v", fname, err)
-	}
-	defer f.Close()
-
-	b := mcshapes.NewSphere(mcshapes.WithRadius(radius), mcshapes.WithCenter(center),
-		mcshapes.WithSphereSurface("minecraft:" + exteriorBlockType),
-		mcshapes.WithSphereInteriorSurface("minecraft:" + interiorBlockType))
-	err = b.WriteShape(f)
-	if err != nil {
-		return fmt.Errorf("ClearForWall: %v", err)
 	}
 
 	return nil

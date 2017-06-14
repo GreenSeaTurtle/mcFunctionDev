@@ -30,10 +30,10 @@ way of learning the language basics.
 
 ### Example 1:
 
-Below is an Minecraft screenshot of a waterfall produced by
+Below is a Minecraft screenshot of a waterfall produced by
 mcFunctionDev.
 
-![alt text](waterfall_01.png)
+![alt text](exampleWaterfall.png)
 
 mcFunctionDev is run and produces Minecraft function files to generate
 the waterfall in various orientations. An example of such a function
@@ -75,3 +75,16 @@ top can freeze and form ice. This is prevented by by having a hidden
 layer of lava below the water and seperated by a glass layer.
 
 
+### Example 2:
+
+Below is a Minecraft screenshot of several spheres produced by
+mcFunctionDev.
+
+![alt text](exampleSpheres.png)
+
+As with the waterfall example above, the sphere mcfunction file
+contains a number of Minecraft fill commands, a very large number of
+fill commands since each block is placed with one fill command. For
+example, a sphere of radius 20 with the interior completely filled
+needs 33401 fill commands. While this seems like a lot, it executes in
+Minecraft very quickly.

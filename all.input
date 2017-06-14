@@ -1,0 +1,10 @@
+SphereRadius            = [5,             10,            20,           5,       10,      20,
+                           5,             10,            20,
+                           5,             10,            20]
+SphereExteriorBlockType = ["glass",       "glass",       "glass",      "glass", "glass", "glass",
+                           "sea_lantern", "sea_lantern", "sea_lantern",
+			   "glowstone",   "glowstone",   "glowstone"]
+SphereInteriorBlockType = ["lava",        "lava",        "lava",       "none",  "none",  "none",
+                           "none",        "none",        "none",
+                           "none",        "none",        "none"]
+			   
