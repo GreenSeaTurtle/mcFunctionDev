@@ -18,7 +18,7 @@ type Sphere struct {
 func NewSphere(opts ...SphereOption) *Sphere {
 	s := &Sphere{
 		surface: "minecraft:glass",
-		interior_surface:  "none",   // "none" means no interior
+		interiorSurface:  "none",   // "none" means no interior
 		radius: 30,
 		center: XYZ{Y: 30}, //default center to bring whole sphere on surface
 	}
@@ -74,10 +74,10 @@ func (s *Sphere) WriteShape(w io.Writer) error {
 					voxels = append(voxels, b)
 				}
 				if outline < float64(s.radius-2) {
-					if s.interior_surface != "none" {
+					if s.interiorSurface != "none" {
 						b := NewBox(
 							At(XYZ{X: x + s.center.X, Y: y + s.center.Y, Z: z + s.center.Z}),
-							WithSurface(s.interior_surface))
+							WithSurface(s.interiorSurface))
 						voxels = append(voxels, b)
 					}
 				}
