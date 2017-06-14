@@ -27,6 +27,18 @@ way of learning the language basics.
 
     go get github.com/GreenSeaTurtle/mcFunctionDev
 
+### Dependencies on other projects
+
+This project currently depends on the following projects:
+
+    go get github.com/BurntSushi/toml  
+    go get github.com/olekukonko/tablewriter  
+    go get github.com/benmcclelland/mcrender  
+
+    toml - used to parse the init file and the input file  
+    tablewriteter - writes text output in tabular format  
+    mcrender - visualize objects that have been generated. This relies  
+               on the fauxgl project (github.com/fogleman/fauxgl)
 
 ### Example 1:
 
