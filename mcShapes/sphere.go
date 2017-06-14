@@ -8,10 +8,10 @@ import (
 // Sphere is a hollow sphere defined by a center
 // point and a radius with a given surface
 type Sphere struct {
-	surface string
-	interior_surface string
-	radius  int
-	center  XYZ
+	surface         string
+	interiorSurface string
+	radius          int
+	center          XYZ
 }
 
 // NewSphere creates a new sphere
@@ -47,7 +47,7 @@ func WithSphereSurface(surface string) SphereOption {
 // If this has the special value of "none" then the interior will be
 // left empty.
 func WithSphereInteriorSurface(surface string) SphereOption {
-	return func(s *Sphere) { s.interior_surface = surface }
+	return func(s *Sphere) { s.interiorSurface = surface }
 }
 
 // WithCenter set the center point of the sphere
