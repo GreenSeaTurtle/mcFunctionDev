@@ -1,13 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 	mcshapes "github.com/GreenSeaTurtle/mcFunctionDev/mcShapes"
 	"github.com/olekukonko/tablewriter"
+	"github.com/benmcclelland/mcrender"
 )
 
 // Structure for using TOML to extract input from the user.
@@ -53,7 +56,7 @@ func CreateSphereDriver(inputFile string, basepath string) {
 	if maxdim > 0 {
 		// First echo user input to stdout so the user knows what was done.
 		// This also sets the filename to write the Minecraft function data.
-		fmt.Println("Creating Sphere Functions for Minecraft")
+		fmt.Println("\nCreating Sphere Functions for Minecraft")
 		fmt.Println("The following table summarizes user input for the spheres:")
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"Filename", "Radius", "Exterior", "Interior"})
@@ -102,8 +105,20 @@ func CreateSphere(basepath string, filename string, radius int, exteriorBlockTyp
 		mcshapes.WithSphereInteriorSurface("minecraft:"+interiorBlockType))
 	err = b.WriteShape(f)
 	if err != nil {
-		return fmt.Errorf("ClearForWall: %v", err)
+		return fmt.Errorf("CreateSphere write mcfunctions: %v", err)
 	}
+
+	var buf bytes.Buffer
+	if err = b.WriteShape(&buf); err != nil {
+		return fmt.Errorf("CreateSphere write to buffer: %v", err)		
+	}
+
+	stlname := "stlFiles/" + strings.Replace(filename, "mcfunction", "stl", 1)
+	err = mcrender.CreateSTLFromInput(&buf, stlname)
+	if err != nil {
+		return fmt.Errorf("CreateSphere render to stl file: %v", err)
+	}
+
 
 	return nil
 }

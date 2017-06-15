@@ -1,6 +1,123 @@
 package main
 
-import mcshapes "github.com/GreenSeaTurtle/mcFunctionDev/mcShapes"
+import (
+	"bytes"
+	"fmt"
+	"os"
+	"path"
+	"strings"
+
+	"github.com/BurntSushi/toml"
+	mcshapes "github.com/GreenSeaTurtle/mcFunctionDev/mcShapes"
+	"github.com/olekukonko/tablewriter"
+	"github.com/benmcclelland/mcrender"
+)
+
+
+// Structure for using TOML to extract input from the user.
+type mcfdFallsInputStruct struct {
+	FallWidth            []int    `toml:"FallWidth"`
+	FallHeight           []int    `toml:"FallHeight"`
+	FallFlowBlock        []string `toml:"FallFlowBlock"`
+}
+
+//BuildWaterFalls builds n, s, e, w waterfalls
+func BuildFalls(inputFile string, basepath string) error {
+	// Extract pertinent input, using TOML, from the user input file
+	var mcfdInput mcfdFallsInputStruct
+	if _, err := toml.DecodeFile(inputFile, &mcfdInput); err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	// Consistency check on the user input
+	dim := [3]int{0, 0, 0}
+	dim[0] = len(mcfdInput.FallWidth)
+	dim[1] = len(mcfdInput.FallHeight)
+	dim[2] = len(mcfdInput.FallFlowBlock)
+	maxdim := dim[0]
+	mindim := dim[0]
+	for _, v := range dim {
+		if v < mindim {
+			mindim = v
+		}
+		if v > maxdim {
+			maxdim = v
+		}
+	}
+	if maxdim != mindim {
+		fmt.Println("BuildFalls user input FATAL ERROR")
+		fmt.Println("You must specify the same number of array values for all the")
+		fmt.Println("BuildFalls arrays - FallWidth, FallHeight, ...")
+		return nil
+	}
+
+	// Create the falls requested by the user in the user input file.
+	if maxdim > 0 {
+		// First echo user input to stdout so the user knows what was done.
+		// This also sets the filename to write the Minecraft function data.
+		fmt.Println("\nCreating Falls Functions for Minecraft")
+		fmt.Println("The following table summarizes user input for the falls:")
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"Filename", "Width", "Height", "Flow"})
+		filename := make([]string, maxdim*4)
+		directionValues := []string{"north", "east", "south", "west"}
+		for i := 0; i < maxdim; i++ {
+			for j := 0; j < 4; j++ {
+				direction := directionValues[j]
+				k := j + i*4
+				// Minecraft functions must have a suffix of ".mcfunction"
+				swidth := fmt.Sprintf("%d", mcfdInput.FallWidth[i])
+				sheight := fmt.Sprintf("%d", mcfdInput.FallHeight[i])
+				blkname := mcfdInput.FallFlowBlock[i] + "fall"
+				filename[k] = blkname + "_" + direction + "_" + swidth + "_" +
+					sheight + ".mcfunction"
+				table.Append([]string{filename[k], swidth, sheight,
+					mcfdInput.FallFlowBlock[i]})
+					
+			}
+		}
+		table.Render()
+
+		origin := mcshapes.XYZ{X: 0, Y: 0, Z: -2}
+		for i := 0; i < maxdim; i++ {
+			for j := 0; j < 4; j++ {
+				direction := directionValues[j]
+				k := j + i*4
+				fname := path.Join(basepath, filename[k])
+				f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+				if err != nil {
+					return fmt.Errorf("open FallsBuild %v: %v", fname, err)
+				}
+
+				falltype := mcfdInput.FallFlowBlock[i] + "fall"   // lavafall or waterfall
+				obj := mcshapes.NewMCObject(mcshapes.WithOrientation(direction),
+					mcshapes.WithType(falltype), mcshapes.WithWidth(mcfdInput.FallWidth[i]),
+					mcshapes.WithHeight(mcfdInput.FallHeight[i]))
+				wf := CreateWaterfall(origin, obj)
+				err = mcshapes.WriteShapes(f, wf)
+				if err != nil {
+					return fmt.Errorf("BuildFalls: %v", err)
+				}
+				f.Close()
+
+				var buf bytes.Buffer
+				if err = mcshapes.WriteShapes(&buf, wf); err != nil {
+					return fmt.Errorf("BuildFalls write to buffer: %v", err)		
+				}
+
+				stlname := "stlFiles/" + strings.Replace(filename[k], "mcfunction", "stl", 1)
+				err = mcrender.CreateSTLFromInput(&buf, stlname)
+				if err != nil {
+					return fmt.Errorf("CreateSphere render to stl file: %v", err)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 
 // CreateWaterfall creates a water or lava fall at the origin with attributes
 func CreateWaterfall(origin mcshapes.XYZ, o *mcshapes.MCObject) []mcshapes.ObjectWriter {

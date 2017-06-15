@@ -1,3 +1,8 @@
+FallWidth     = [10,      30,      100,     10,     30,     100]
+FallHeight    = [7,       10,      30,      7,      10,     30]
+FallFlowBlock = ["water", "water", "water", "lava", "lava", "lava"]
+
+
 SphereRadius            = [5,             10,            20,           5,       10,      20,
                            5,             10,            20,
                            5,             10,            20]
