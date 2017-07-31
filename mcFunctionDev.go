@@ -84,6 +84,12 @@ func main() {
 	}
 
 	CreateSphereDriver(inputFile, basepath)
+
+	CreateWalkwayDriver(inputFile, basepath)
+
+	CreateMWallDriver(inputFile, basepath)
+
+	CreateClearVolDriver(inputFile, basepath)
 }
 
 //BuildRollerCoasterFalls builds two falls next to each other separated by only one
@@ -190,7 +196,7 @@ func rmFalls(basepath string) error {
 	return nil
 }
 
-// ClearForWall - clear space for a wal
+// ClearForWall - clear space for a wall.
 // A wall in this context is meant to surround some area, such as a Mincraft village, and
 // provides protection from Minecraft Hostile Mobs (zombies, creeper, spiders, ...). The wall
 // should be at least 3 blocks high and it needs an overhang to keep the spiders out (spiders
@@ -200,7 +206,8 @@ func rmFalls(basepath string) error {
 // area. Space is also left on the inside of the wall so villagers will not accidentally find
 // their way outside the wall.
 // The lava and water falls provide an excellent wall. Such falls are tall enough and come
-// with a ledge on the outside. They are also visually stunning.
+// with a ledge on the outside. They are also visually stunning. The ledge keeps spiders from
+// crawling up and over the wall.
 // This function clears space for the wall. The width, height, and depth parameters specify the
 // extent of the cleared area. The wall is put in the middle of the cleared area.
 func ClearForWall(basepath string) error {

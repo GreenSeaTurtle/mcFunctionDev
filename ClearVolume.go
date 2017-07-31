@@ -75,12 +75,14 @@ func CreateClearVolDriver(inputFile string, basepath string) {
 	fmt.Println("The following table summarizes user input for the volumes:")
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Filename", "Width", "Depth", "Height", "Block"})
-	filename := make([]string, maxdim*4)
+	ndirvals := 4
+	filename := make([]string, maxdim*ndirvals)
 	directionValues := []string{"north", "east", "south", "west"}
+	directionNames  := []string{"N",     "E",    "S",     "W"}
 	for i := 0; i < maxdim; i++ {
-		for j := 0; j < 4; j++ {
-			direction := directionValues[j]
-			k := j + i*4
+		for j := 0; j < ndirvals; j++ {
+			dname := directionNames[j]
+			k := j + i*ndirvals
 			// Minecraft functions must have a suffix of ".mcfunction"
 			height := mcfdInput.ClearVolHeight[i]
 			height_str := fmt.Sprintf("%d", mcfdInput.ClearVolHeight[i])
@@ -97,7 +99,7 @@ func CreateClearVolDriver(inputFile string, basepath string) {
 			if bname != "air" {
 				sbname = "_" + bname
 			}
-			filename[k] = "ClearVol_" + direction + swidth + sdepth + sheight + sbname + ".mcfunction"
+			filename[k] = "ClearVol_" + dname + swidth + sdepth + sheight + sbname + ".mcfunction"
 			table.Append([]string{filename[k], width_str, depth_str, height_str, bname})
 		}
 	}
@@ -105,9 +107,9 @@ func CreateClearVolDriver(inputFile string, basepath string) {
 
 	// Now actually create the ClearVol functions
 	for i := 0; i < maxdim; i++ {
-		for j := 0; j < 4; j++ {
+		for j := 0; j < ndirvals; j++ {
 			direction := directionValues[j]
-			k := j + i*4
+			k := j + i*ndirvals
 			err := CreateClearVol(basepath, filename[k], direction,
 				mcfdInput.ClearVolHeight[i],
 				mcfdInput.ClearVolWidth[i],

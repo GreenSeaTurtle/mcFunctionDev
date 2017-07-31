@@ -37,29 +37,87 @@ func CreateWalkwayDriver(inputFile string, basepath string) {
 		fmt.Println("The following table summarizes user input for the walkways:")
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"Filename", "Length"})
-		filename := make([]string, dim*4)
-		filename_cap := make([]string, dim*4)
-		directionValues := []string{"north", "east", "south", "west"}
+		ndirvals := 8
+		filename := make([]string, dim*ndirvals)
+		filename_cap := make([]string, dim*ndirvals)
+		filename_rm := make([]string, dim*ndirvals)
+
+		// The first 4 values are for the straight walkways. The second 4 are for
+		// the angled walkways. The reason for choosing these values
+		//    "north", "east", "south_ew", "west_sn"
+		// for the angled walkways is that these are the 4 orientations that are
+		// only rotations, they do not include reflections. See box.go for an
+		// understanding of this.
+		// Reflections do not matter for the straight walkways because they are built
+		// around the centerline, but we cannot have relections for the angled walkways
+		// because they are at an angle to the centerline.
+		directionValues := []string{"north", "east", "south", "west",
+			"north", "east", "south_ew", "west_sn"}
+		directionNames := []string{"N", "E", "S", "W", "NW", "NE", "SE", "SW"}
+
 		for i := 0; i < dim; i++ {
-			for j := 0; j < 4; j++ {
-				direction := directionValues[j]
-				k := j + i*4
+			for j := 0; j < ndirvals; j++ {
+				dname := directionNames[j]
+				k := j + i*ndirvals
 				// Minecraft functions must have a suffix of ".mcfunction"
 				slen := fmt.Sprintf("%d", mcfdInput.WalkwayLength[i])
-				filename[k] = "Walkway_" + direction + "_" + slen + ".mcfunction"
-				filename_cap[k] = "Walkway_" + direction + "_cap.mcfunction"
-				table.Append([]string{filename[k], slen})
+				filename[k] = "Walkway_" + dname + "_" + slen + ".mcfunction"
+				filename_cap[k] = "Walkway_" + dname + "_cap.mcfunction"
+				filename_rm[k] = "Walkway_" + dname + "_" + slen + "_rm.mcfunction"
+				if dname=="N" || dname=="E" || dname=="S" || dname=="W" {
+					table.Append([]string{filename[k], slen})
+					table.Append([]string{filename_cap[k], slen})
+					table.Append([]string{filename_rm[k], slen})
+				}
+				if dname=="NW" || dname=="NE" || dname=="SE" || dname=="SW" {
+					wlen := mcfdInput.WalkwayLength[i]
+					if wlen >= 10 {
+						table.Append([]string{filename[k], slen})
+						table.Append([]string{filename_rm[k], slen})
+					}
+				}
 			}
 		}
 		table.Render()
 
 		// Now actually create the walkway functions
 		for i := 0; i < dim; i++ {
-			for j := 0; j < 4; j++ {
+			for j := 0; j < ndirvals; j++ {
 				direction := directionValues[j]
-				k := j + i*4
-				err := CreateWalkway(basepath, filename[k], direction,
-					mcfdInput.WalkwayLength[i])
+				dname := directionNames[j]
+				k := j + i*ndirvals
+				var err error
+				
+				// Functions to create the walkways
+				if dname=="N" || dname=="E" || dname=="S" || dname=="W" {
+					err = CreateWalkway(basepath, filename[k], direction,
+						mcfdInput.WalkwayLength[i])
+				}
+				if dname=="NW" || dname=="NE" || dname=="SE" || dname=="SW" {
+					wlen := mcfdInput.WalkwayLength[i]
+					if wlen >= 10 {
+						nconun := wlen / 10
+						err = CreateAngledWalkway(basepath, filename[k], nconun,
+							direction)
+					}
+				}
+				if err != nil {
+					log.Fatalln(err)
+				}
+
+				// Functions to remove the walkways
+				if dname=="N" || dname=="E" || dname=="S" || dname=="W" {
+					err = RmWalkway(basepath, filename_rm[k], direction,
+						mcfdInput.WalkwayLength[i])
+				}
+				if dname=="NW" || dname=="NE" || dname=="SE" || dname=="SW" {
+					wlen := mcfdInput.WalkwayLength[i]
+					if wlen >= 10 {
+						nconun := wlen / 10
+						err = RmAngledWalkway(basepath, filename_rm[k], nconun,
+							direction)
+					}
+				}
 				if err != nil {
 					log.Fatalln(err)
 				}
@@ -69,12 +127,15 @@ func CreateWalkwayDriver(inputFile string, basepath string) {
 
 		// Create the walkway cap functions
 		for i := 0; i < dim; i++ {
-			for j := 0; j < 4; j++ {
+			for j := 0; j < ndirvals; j++ {
 				direction := directionValues[j]
-				k := j + i*4
-				err := CreateWalkwayCap(basepath, filename_cap[k], direction)
-				if err != nil {
-					log.Fatalln(err)
+				dname := directionNames[j]
+				k := j + i*ndirvals
+				if dname=="N" || dname=="E" || dname=="S" || dname=="W" {
+					err := CreateWalkwayCap(basepath, filename_cap[k], direction)
+					if err != nil {
+						log.Fatalln(err)
+					}
 				}
 			}
 		}
@@ -184,11 +245,10 @@ func CreateWalkwayCap(basepath string, filename_cap string,
 }
 
 
-func CreateAngledWalkway(basepath string, nchunk int) error {
-	ntot := nchunk * 10
-	sntot := fmt.Sprintf("%d", ntot)
+// CreateAngledWalkway   NW, NE, SE, SW
+func CreateAngledWalkway(basepath string, filename string, nchunk int,
+	direction string) error {
 
-	filename := "Walkway_NW_" + sntot + ".mcfunction"
 	fname := basepath + "/" + filename
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
@@ -196,7 +256,6 @@ func CreateAngledWalkway(basepath string, nchunk int) error {
 	}
 	defer f.Close()
 
-	direction := "north"
 	xt := 0
 	zt := 0
 	for nc := 0; nc < nchunk; nc++ {
@@ -311,6 +370,117 @@ func WriteAngledWalkwayPath(xs int, ys int, zs int, nblocks int, ymax int,
 
 	return nil
 }
+
+
+//**************************************************************************************************
+//**************************************************************************************************
+// Functions to remove the walkways
+// When a mistake is made, or when testing, the user may need to remove a walkway.
+// This is not an "undo" function, it instead replaces the walkway with air and replaces the
+// y = -1 layer with dirt. There is no way to provide a proper "undo" function.
+//**************************************************************************************************
+//**************************************************************************************************
+
+// RmWalkway remove a straight walkway, replacing the -1 layer with dirt
+func RmWalkway(basepath string, filename string, direction string,
+	wlength int) error {
+
+	fname := basepath + "/" + filename
+	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+	if err != nil {
+		return fmt.Errorf("CreateWalkway open %v: %v", fname, err)
+	}
+	defer f.Close()
+
+	WriteWalkwayBox( -8, -1, -1,  8, -1, -wlength, "dirt", direction, f)
+	WriteWalkwayBox( -8,  0, -1,  8,  0, -wlength, "air", direction, f)
+	WriteWalkwayBox( -8,  1, -1,  8,  1, -wlength, "air", direction, f)
+	WriteWalkwayBox( -7,  2, -1,  7,  2, -wlength, "air", direction, f)
+	WriteWalkwayBox( -7,  3, -1,  7,  3, -wlength, "air", direction, f)
+	WriteWalkwayBox( -6,  4, -1,  6,  4, -wlength, "air", direction, f)
+	WriteWalkwayBox( -5,  5, -1,  5,  5, -wlength, "air", direction, f)
+	WriteWalkwayBox( -4,  6, -1,  4,  6, -wlength, "air", direction, f)
+	WriteWalkwayBox( -2,  7, -1,  2,  7, -wlength, "air", direction, f)
+	WriteWalkwayBox( -2,  8, -1,  2,  8, -wlength, "air", direction, f)
+
+	return nil
+}
+
+
+// RmAngledWalkway  Remove an angled walkway   NW, NE, SE, SW
+func RmAngledWalkway(basepath string, filename string, nchunk int,
+	direction string) error {
+
+	fname := basepath + "/" + filename
+	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+	if err != nil {
+		return fmt.Errorf("CreateWalkway open %v: %v", fname, err)
+	}
+	defer f.Close()
+
+	xt := 0
+	zt := 0
+	for nc := 0; nc < nchunk; nc++ {
+		xt = -nc*10
+		zt = xt
+		RmAngledWalkwayPath( xt-1, -1, zt-1,  10, 8, direction, "n", f)
+		RmAngledWalkwayPath( xt-1, -1, zt-2,  10, 8, direction, "y", f)
+		RmAngledWalkwayPath( xt+0, -1, zt-2,  10, 8, direction, "y", f)
+		RmAngledWalkwayPath( xt+0, -1, zt-3,  10, 8, direction, "y", f)
+		RmAngledWalkwayPath( xt+1, -1, zt-3,  10, 8, direction, "y", f)
+		RmAngledWalkwayPath( xt+1, -1, zt-4,  10, 8, direction, "y", f)
+		RmAngledWalkwayPath( xt+2, -1, zt-4,  10, 6, direction, "y", f)
+		RmAngledWalkwayPath( xt+2, -1, zt-5,  10, 6, direction, "y", f)
+		RmAngledWalkwayPath( xt+3, -1, zt-5,  10, 6, direction, "y", f)
+		RmAngledWalkwayPath( xt+3, -1, zt-6,  10, 6, direction, "y", f)
+		RmAngledWalkwayPath( xt+4, -1, zt-6,  10, 5, direction, "y", f)
+		RmAngledWalkwayPath( xt+4, -1, zt-7,  10, 5, direction, "y", f)
+		RmAngledWalkwayPath( xt+5, -1, zt-7,  10, 4, direction, "y", f)
+		RmAngledWalkwayPath( xt+5, -1, zt-8,  10, 4, direction, "y", f)
+		RmAngledWalkwayPath( xt+6, -1, zt-8,  10, 3, direction, "y", f)
+		RmAngledWalkwayPath( xt+6, -1, zt-9,  10, 3, direction, "y", f)
+		RmAngledWalkwayPath( xt+7, -1, zt-9,  10, 1, direction, "y", f)
+	}
+
+	return nil
+}
+
+
+func RmAngledWalkwayPath(xs int, ys int, zs int, nblocks int, ymax int,
+	direction string, reflect string, f *os.File) error {
+
+	yv := ys
+	for n:=0; n < nblocks; n++ {
+		x1 := xs - n
+		z1 := zs - n
+		if yv == -1 {
+			WriteWalkwayBox( x1, -1, z1, x1, -1, z1, "dirt", direction, f)
+			for y := 0; y <= ymax; y++ {
+				WriteWalkwayBox( x1, y, z1, x1, y, z1, "air", direction, f)
+			}
+		}
+
+		if reflect == "y" {
+			z2 := x1
+			x2 := z1
+			if yv == -1 {
+				WriteWalkwayBox( x2, -1, z2, x2, -1, z2, "dirt", direction, f)
+				for y := 0; y <= ymax; y++ {
+					WriteWalkwayBox( x2, y, z2, x2, y, z2, "air", direction, f)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+
+//**************************************************************************************************
+//**************************************************************************************************
+// Low level walkway functions
+//**************************************************************************************************
+//**************************************************************************************************
 
 
 // WriteWalkwayBox writes out a low level box for the walkway.

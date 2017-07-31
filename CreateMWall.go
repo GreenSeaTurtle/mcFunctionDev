@@ -22,6 +22,10 @@ type mcfdMWallInputStruct struct {
 	MWallBrickBlockType []string `toml:"MWallBrickBlockType"`
 }
 
+// The construction unit for MWall is 2 blocks wide. This unit is duplicated
+// as needed to achieve the total desired width.
+var conun_width int = 2
+
 // CreateMWallDriver
 // Driver for creating the Minecraft function files for this type of
 // castle wall.
@@ -72,13 +76,16 @@ func CreateMWallDriver(inputFile string, basepath string) {
 	fmt.Println("The following table summarizes user input for the m walls:")
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Filename", "Height", "Width", "Depth", "Wood", "Brick"})
-	filename := make([]string, maxdim*4)
-	filename_rm := make([]string, maxdim*4)
-	directionValues := []string{"north", "east", "south", "west"}
+	ndirvals := 8
+	filename := make([]string, maxdim*ndirvals)
+	filename_rm := make([]string, maxdim*ndirvals)
+	directionValues := []string{"north", "north_ew", "east", "east_sn", "south",
+		 "south_ew", "west", "west_sn"}
+	directionNames := []string{"NWE", "NEW", "ENS", "ESN", "SWE", "SEW", "WNS", "WSN"}
 	for i := 0; i < maxdim; i++ {
-		for j := 0; j < 4; j++ {
-			direction := directionValues[j]
-			k := j + i*4
+		for j := 0; j < ndirvals; j++ {
+			dname := directionNames[j]
+			k := j + i*ndirvals
 			// Minecraft functions must have a suffix of ".mcfunction"
 			sheight := fmt.Sprintf("%d", mcfdInput.MWallHeight[i])
 			swidth := fmt.Sprintf("%d", mcfdInput.MWallWidth[i])
@@ -87,8 +94,8 @@ func CreateMWallDriver(inputFile string, basepath string) {
 			brick_blkname := mcfdInput.MWallBrickBlockType[i]
 			//filename[k] = "MWall_" + direction + "_" + sheight + "_" + swidth + "_" +
 			//	sdepth + "_" + wood_blkname + "_" + brick_blkname + ".mcfunction"
-			filename[k] = "MWall_" + direction + "_" + sheight + "_" + swidth + ".mcfunction"
-			filename_rm[k] = "MWall_" + direction + "_" + sheight + "_" + swidth + "_rm.mcfunction"
+			filename[k] = "MWall_" + dname + "_" + sheight + "_" + swidth + ".mcfunction"
+			filename_rm[k] = "MWall_" + dname + "_" + sheight + "_" + swidth + "_rm.mcfunction"
 
 			table.Append([]string{filename[k], sheight, swidth, sdepth,
 				wood_blkname, brick_blkname})
@@ -100,9 +107,9 @@ func CreateMWallDriver(inputFile string, basepath string) {
 
 	// Now actually create the MWall functions
 	for i := 0; i < maxdim; i++ {
-		for j := 0; j < 4; j++ {
+		for j := 0; j < ndirvals; j++ {
 			direction := directionValues[j]
-			k := j + i*4
+			k := j + i*ndirvals
 			err := CreateMWall(basepath, filename[k], direction,
 				mcfdInput.MWallHeight[i],
 				mcfdInput.MWallWidth[i],
@@ -142,9 +149,9 @@ func CreateMWall(basepath string, filename string, direction string,
 	height := total_height - 2      // Height of the wood
 	total_depth := depth + 3 + 3    // Depth of the wall
 
-	// A single construction unit is 2 columns wide. This is repeated as many
-	// times as needed to get the desired width.
-	nc := width/2
+	// A single construction unit is 2 columns wide (conun_width). This is repeated
+	// as many times as needed to get the desired width.
+	nc := width/conun_width
 
 	// near and far are along the negative Z axis when facing north.
 	// near is > far, for example near = -2, far = -8
@@ -207,7 +214,7 @@ func RmMWall(basepath string, filename string, direction string,
 	}
 	defer f.Close()
 
-	nc := width/2
+	nc := width/conun_width
 	total_depth := depth + 3 + 3
 
 	near_bf := -2                         // Near brick face
@@ -227,7 +234,7 @@ func WriteMWallBox(x1 int, y1 int, z1 int, x2 int, y2 int, z2 int,
 
 	xt := 0
 	for n:=0; n<nconun; n++ {
-		xt = n*2
+		xt = n*conun_width
 		corner1 := mcshapes.XYZ{X: xt+x1, Y: y1, Z: z1}
 		corner2 := mcshapes.XYZ{X: xt+x2, Y: y2, Z: z2}
 		b := mcshapes.NewBox(mcshapes.WithCorner1(corner1), mcshapes.WithCorner2(corner2),
