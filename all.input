@@ -3,6 +3,15 @@ FallHeight    = [7,       10,      30,      7,      10,     30]
 FallFlowBlock = ["water", "water", "water", "lava", "lava", "lava"]
 
 
+Sign7Index         = [0]
+Sign7Text1         = ["TURTLE"]
+Sign7Text2         = ["none"]
+Sign7Text3         = ["none"]
+Sign7BackBlockType = ["lapis_block"]
+Sign7EdgeBlockType = ["sea_lantern"]
+Sign7TextBlockType = ["gold_block"]
+
+
 SphereRadius            = [5,             10,            20,           5,       10,      20,
                            5,             10,            20,
                            5,             10,            20]
@@ -15,15 +24,17 @@ SphereInteriorBlockType = ["lava",        "lava",        "lava",       "none",  
 
 WalkwayLength = [5, 10, 50, 100]
 
+# M type castle wall
+# Width must be >=2 and must be even
 MWallHeight         = [15,              15,              15]
-MWallWidth          = [1,               10,              50]
+MWallWidth          = [2,               10,              50]
 MWallDepth          = [1,               1,               1]
 MWallWoodBlockType  = ["log 1",         "log 1",         "log 1"]
 MWallBrickBlockType = ["monster_egg 2", "monster_egg 2", "monster_egg 2"]
 
 
 # Clear a volume
-ClearVolWidth     = [ 11,    51,   5,              75,   51,      75]
-ClearVolDepth     = [ 11,    51,   5,              75,   51,      75]
-ClearVolHeight    = [100,   100,   5,             100,   100,      6]
-ClearVolBlockType = ["air", "air", "sea_lantern", "air", "dirt", "dirt"]
+ClearVolWidth     = [ 11,    51,    75,   51,      75]
+ClearVolDepth     = [ 11,    51,    75,   51,      75]
+ClearVolHeight    = [100,   100,   100,   1,        1]
+ClearVolBlockType = ["air", "air", "air", "dirt", "dirt"]

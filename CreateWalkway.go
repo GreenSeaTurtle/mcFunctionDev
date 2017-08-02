@@ -61,9 +61,9 @@ func CreateWalkwayDriver(inputFile string, basepath string) {
 				k := j + i*ndirvals
 				// Minecraft functions must have a suffix of ".mcfunction"
 				slen := fmt.Sprintf("%d", mcfdInput.WalkwayLength[i])
-				filename[k] = "Walkway_" + dname + "_" + slen + ".mcfunction"
-				filename_cap[k] = "Walkway_" + dname + "_cap.mcfunction"
-				filename_rm[k] = "Walkway_" + dname + "_" + slen + "_rm.mcfunction"
+				filename[k] = "ww_" + dname + "_" + slen + ".mcfunction"
+				filename_cap[k] = "ww_" + dname + "_cap.mcfunction"
+				filename_rm[k] = "ww_" + dname + "_" + slen + "_rm.mcfunction"
 				if dname=="N" || dname=="E" || dname=="S" || dname=="W" {
 					table.Append([]string{filename[k], slen})
 					table.Append([]string{filename_cap[k], slen})
@@ -147,7 +147,7 @@ func CreateWalkwayDriver(inputFile string, basepath string) {
 func CreateWalkway(basepath string, filename string, direction string,
 	wlength int) error {
 
-	fname := basepath + "/" + filename
+	fname := basepath + "/Walkway/" + filename
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("CreateWalkway open %v: %v", fname, err)
@@ -223,7 +223,7 @@ func CreateWalkway(basepath string, filename string, direction string,
 func CreateWalkwayCap(basepath string, filename_cap string,
 	direction string) error {
 
-	fname_cap := basepath + "/" + filename_cap
+	fname_cap := basepath + "/Walkway/" + filename_cap
 	f, err := os.OpenFile(fname_cap, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("CreateWalkwayCap open %v: %v", fname_cap, err)
@@ -249,7 +249,7 @@ func CreateWalkwayCap(basepath string, filename_cap string,
 func CreateAngledWalkway(basepath string, filename string, nchunk int,
 	direction string) error {
 
-	fname := basepath + "/" + filename
+	fname := basepath + "/Walkway/" + filename
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("CreateWalkway open %v: %v", fname, err)
@@ -385,7 +385,7 @@ func WriteAngledWalkwayPath(xs int, ys int, zs int, nblocks int, ymax int,
 func RmWalkway(basepath string, filename string, direction string,
 	wlength int) error {
 
-	fname := basepath + "/" + filename
+	fname := basepath + "/Walkway/" + filename
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("CreateWalkway open %v: %v", fname, err)
@@ -411,7 +411,7 @@ func RmWalkway(basepath string, filename string, direction string,
 func RmAngledWalkway(basepath string, filename string, nchunk int,
 	direction string) error {
 
-	fname := basepath + "/" + filename
+	fname := basepath + "/Walkway/" + filename
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("CreateWalkway open %v: %v", fname, err)

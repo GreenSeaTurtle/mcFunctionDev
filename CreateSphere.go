@@ -69,7 +69,7 @@ func CreateSphereDriver(inputFile string, basepath string) {
 				blkname = mcfdInput.SphereExteriorBlockType[i] + "_" +
 					mcfdInput.SphereInteriorBlockType[i]
 			}
-			filename[i] = "Sphere_" + blkname + "_" + srad + ".mcfunction"
+			filename[i] = "s_" + blkname + "_" + srad + ".mcfunction"
 
 			table.Append([]string{filename[i], srad, mcfdInput.SphereExteriorBlockType[i],
 				mcfdInput.SphereInteriorBlockType[i]})
@@ -93,7 +93,7 @@ func CreateSphere(basepath string, filename string, radius int, exteriorBlockTyp
 	interiorBlockType string) error {
 	center := mcshapes.XYZ{X: radius, Y: 0, Z: radius + 2}
 
-	fname := basepath + "/" + filename
+	fname := basepath + "/Sphere/" + filename
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("CreateSphere open %v: %v", fname, err)

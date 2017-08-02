@@ -94,8 +94,8 @@ func CreateMWallDriver(inputFile string, basepath string) {
 			brick_blkname := mcfdInput.MWallBrickBlockType[i]
 			//filename[k] = "MWall_" + direction + "_" + sheight + "_" + swidth + "_" +
 			//	sdepth + "_" + wood_blkname + "_" + brick_blkname + ".mcfunction"
-			filename[k] = "MWall_" + dname + "_" + sheight + "_" + swidth + ".mcfunction"
-			filename_rm[k] = "MWall_" + dname + "_" + sheight + "_" + swidth + "_rm.mcfunction"
+			filename[k] = "mw_" + dname + "_" + sheight + "_" + swidth + ".mcfunction"
+			filename_rm[k] = "mw_" + dname + "_" + sheight + "_" + swidth + "_rm.mcfunction"
 
 			table.Append([]string{filename[k], sheight, swidth, sdepth,
 				wood_blkname, brick_blkname})
@@ -137,7 +137,7 @@ func CreateMWall(basepath string, filename string, direction string,
 	total_height int, width int, depth int, wood_btype string,
 	brick_btype string) error {
 
-	fname := basepath + "/" + filename
+	fname := basepath + "/MWall/" + filename
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("CreateMWall open %v: %v", fname, err)
@@ -207,7 +207,7 @@ func CreateMWall(basepath string, filename string, direction string,
 func RmMWall(basepath string, filename string, direction string,
 	total_height int, width int, depth int) error {
 
-	fname := basepath + "/" + filename
+	fname := basepath + "/MWall/" + filename
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("CreateMWall open %v: %v", fname, err)

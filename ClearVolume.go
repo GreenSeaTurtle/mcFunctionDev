@@ -99,7 +99,7 @@ func CreateClearVolDriver(inputFile string, basepath string) {
 			if bname != "air" {
 				sbname = "_" + bname
 			}
-			filename[k] = "ClearVol_" + dname + swidth + sdepth + sheight + sbname + ".mcfunction"
+			filename[k] = "cv_" + dname + swidth + sdepth + sheight + sbname + ".mcfunction"
 			table.Append([]string{filename[k], width_str, depth_str, height_str, bname})
 		}
 	}
@@ -127,7 +127,7 @@ func CreateClearVolDriver(inputFile string, basepath string) {
 func CreateClearVol(basepath string, filename string, direction string,
 	height int, width int, depth int, btype string) error {
 
-	fname := basepath + "/" + filename
+	fname := basepath + "/ClearVol/" + filename
 	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("CreateClearVol open %v: %v", fname, err)

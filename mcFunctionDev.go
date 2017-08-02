@@ -3,12 +3,12 @@ package main
 import (
 	//"flag"
 	"fmt"
-	"log"
+	//"log"
 	"os"
 	"path"
 
 	"github.com/BurntSushi/toml"
-	mcshapes "github.com/GreenSeaTurtle/mcFunctionDev/mcShapes"
+	//mcshapes "github.com/GreenSeaTurtle/mcFunctionDev/mcShapes"
 )
 
 // mcFunctionPath struct for reading various things from the init file
@@ -63,190 +63,15 @@ func main() {
 
 
 	//fmt.Println("basepath = " + basepath)
-	err := BuildFalls(inputFile, basepath)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	//err := BuildFalls(inputFile, basepath)
+	//if err != nil {
+	//	log.Fatalln(err)
+	//}
 
-	err = BuildRollerCoasterFalls(basepath)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	err = rmFalls(basepath)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	err = ClearForWall(basepath)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	CreateSphereDriver(inputFile, basepath)
-
-	CreateWalkwayDriver(inputFile, basepath)
-
-	CreateMWallDriver(inputFile, basepath)
-
-	CreateClearVolDriver(inputFile, basepath)
-}
-
-//BuildRollerCoasterFalls builds two falls next to each other separated by only one
-// block. It adds redstone and track to make it a roller coaster ride.
-func BuildRollerCoasterFalls(basepath string) error {
-	// Create the file that will contain both the north and south waterfalls.
-	fname := path.Join(basepath, "waterfall_rc_north_south.mcfunction")
-	f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
-	if err != nil {
-		return fmt.Errorf("open %v: %v", fname, err)
-	}
-	defer f.Close()
-
-	// Build the north fall - faces south, runs west to east.
-	origin := mcshapes.XYZ{X: 2, Y: 0, Z: -2}
-	direction := "north"
-	obj := mcshapes.NewMCObject(mcshapes.WithOrientation(direction))
-	wf := CreateWaterfall(origin, obj)
-	err = mcshapes.WriteShapes(f, wf)
-	if err != nil {
-		return fmt.Errorf("build waterfall rc north fall: %v", err)
-	}
-
-	// Build the south fall - faces north, runs west to east.
-	// The north and south falls are -1 blocks apart and so they share the same blocks for
-	// the front of the basin. In fact, the south falls overwrites what the north falls
-	// for the front of the basin.
-	// This ends up producing two sheets of water, one block apart. The roller coaster
-	// goes between those sheets.
-	origin = mcshapes.XYZ{X: 2, Y: 0, Z: 2}
-	direction = "south"
-	obj = mcshapes.NewMCObject(mcshapes.WithOrientation(direction))
-	wf = CreateWaterfall(origin, obj)
-	err = mcshapes.WriteShapes(f, wf)
-	if err != nil {
-		return fmt.Errorf("build waterfall rc south fall: %v", err)
-	}
-
-	// At this point we have two waterfalls facing each other, separated by one row of blocks,
-	// i.e. the front of the basin which defaults to sandstone.
-	// Change those blocks to be redstone in preparation for putting tracks on them.
-	// Replace the sandstone with redstone to power the rails.
-	width := 102
-	corner1 := mcshapes.XYZ{X: origin.X, Y: origin.Y, Z: origin.Z - 4}
-	corner2 := mcshapes.XYZ{X: origin.X + width - 1, Y: origin.Y, Z: origin.Z - 4}
-	b := mcshapes.NewBox(mcshapes.WithCorner1(corner1), mcshapes.WithCorner2(corner2),
-		mcshapes.WithSurface("minecraft:redstone_block"))
-	err = b.WriteShape(f)
-	if err != nil {
-		return fmt.Errorf("build waterfall rc redstone: %v", err)
-	}
-
-	// Lay down powered track on top of the redstone.
-	corner1.Y += 1
-	corner2.Y += 1
-	b = mcshapes.NewBox(mcshapes.WithCorner1(corner1), mcshapes.WithCorner2(corner2),
-		mcshapes.WithSurface("minecraft:golden_rail"))
-	err = b.WriteShape(f)
-	if err != nil {
-		return fmt.Errorf("build waterfall rc track: %v", err)
-	}
-
-	return nil
-}
-
-// rmFalls removes north, south, east, west waterfalls
-// After placing a water or lava fall somewhere in the Minecraft game, it is sometimes
-// necessary to remove it. Perhaps, for example, it was placed in the wrong location and
-// needs to be moved. This function writes out a Minecraft function to do this using the
-// Minecraft fill command.
-// An example of this command is:
-//    fill ~0 ~0 ~-2 ~101 ~30 ~-6 minecraft:air
-// The ~ refers to the players current position in the game.
-// Yes, a fall could be removed by hand inside the game, but this is very tedious, thus
-// the need for this function.
-func rmFalls(basepath string) error {
-	origin := mcshapes.XYZ{X: 0, Y: 0, Z: -2}
-
-	for _, direction := range []string{"north", "east", "south", "west"} {
-		// Minecraft functions must have a suffix of ".mcfunction"
-		fname := path.Join(basepath, "rm_fall_"+direction) + ".mcfunction"
-		f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
-		if err != nil {
-			return fmt.Errorf("rm_fall open %v: %v", fname, err)
-		}
-		defer f.Close()
-
-		width := 100
-		height := 30
-		// Use a loop because Minecraft has a limit on total number of blocks per fill command.
-		for h := 0; h <= height; h++ {
-			corner1 := mcshapes.XYZ{X: origin.X, Y: origin.Y + h, Z: origin.Z}
-			corner2 := mcshapes.XYZ{X: origin.X + width - 1, Y: origin.Y + h, Z: origin.Z - 4}
-			b := mcshapes.NewBox(mcshapes.WithCorner1(corner1), mcshapes.WithCorner2(corner2),
-				mcshapes.WithSurface("minecraft:air"))
-			b.Orient(direction)
-			err = b.WriteShape(f)
-			if err != nil {
-				return fmt.Errorf("rm fall: %v", err)
-			}
-		}
-	}
-
-	return nil
-}
-
-// ClearForWall - clear space for a wall.
-// A wall in this context is meant to surround some area, such as a Mincraft village, and
-// provides protection from Minecraft Hostile Mobs (zombies, creeper, spiders, ...). The wall
-// should be at least 3 blocks high and it needs an overhang to keep the spiders out (spiders
-// can crawl up a wall but cannot get past a ledge). The area inside the wall needs to be lit
-// up so Hostile Mobs will not spawn. There needs to be clear space on the outside of the wall
-// so the Hostile Mobs will not be able to jump to the top of the wall and thus into the secure
-// area. Space is also left on the inside of the wall so villagers will not accidentally find
-// their way outside the wall.
-// The lava and water falls provide an excellent wall. Such falls are tall enough and come
-// with a ledge on the outside. They are also visually stunning. The ledge keeps spiders from
-// crawling up and over the wall.
-// This function clears space for the wall. The width, height, and depth parameters specify the
-// extent of the cleared area. The wall is put in the middle of the cleared area.
-func ClearForWall(basepath string) error {
-	origin := mcshapes.XYZ{X: 0, Y: 0, Z: -2}
-
-	for _, direction := range []string{"north", "east", "south", "west"} {
-		// Minecraft functions must have a suffix of ".mcfunction"
-		fname := path.Join(basepath, "ClearForWall_"+direction) + ".mcfunction"
-		f, err := os.OpenFile(fname, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
-		if err != nil {
-			return fmt.Errorf("rm_fall open %v: %v", fname, err)
-		}
-		defer f.Close()
-
-		// Minecraft will not accept a width that is too large. 150 is too large, 100 works.
-		// Probably has something to do with the size of Minecraft chunks and how many chunks
-		// are active and/or being visualized.
-		width := 100
-		height := 50
-		depth := 17
-
-		// Use a loop because Minecraft has a limit on total number of blocks per fill command.
-		for h := -1; h <= height; h++ {
-			corner1 := mcshapes.XYZ{X: origin.X, Y: origin.Y + h, Z: origin.Z}
-			corner2 := mcshapes.XYZ{X: origin.X + width - 1, Y: origin.Y + h, Z: origin.Z - depth + 1}
-			block_type := "air"
-			if h == -1 {
-				block_type = "sea_lantern"
-			}
-			b := mcshapes.NewBox(mcshapes.WithCorner1(corner1), mcshapes.WithCorner2(corner2),
-				mcshapes.WithSurface("minecraft:"+block_type))
-			b.Orient(direction)
-			err = b.WriteShape(f)
-			if err != nil {
-				return fmt.Errorf("ClearForWall: %v", err)
-			}
-		}
-	}
-
-	return nil
+	//CreateClearVolDriver(inputFile, basepath)
+	//CreateMWallDriver(inputFile, basepath)
+	CreateSign7Driver(inputFile, basepath)
+	//CreateSphereDriver(inputFile, basepath)
+	//CreateWalkwayDriver(inputFile, basepath)
 }
 
