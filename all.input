@@ -3,13 +3,13 @@ FallHeight    = [7,       10,      30,      7,      10,     30]
 FallFlowBlock = ["water", "water", "water", "lava", "lava", "lava"]
 
 
-Sign7Index         = [0]
-Sign7Text1         = ["TURTLE"]
-Sign7Text2         = ["none"]
-Sign7Text3         = ["none"]
-Sign7BackBlockType = ["lapis_block"]
-Sign7EdgeBlockType = ["sea_lantern"]
-Sign7TextBlockType = ["gold_block"]
+Sign7Index         = [0,              1,                2]
+Sign7Text1         = ["TURTLE",       "ABCDEFGHIJKLM",  "SOUTH"]
+Sign7Text2         = ["TWISTER",      "NOPQRSTUVWXYZ",  "none"]
+Sign7Text3         = ["none",         "0123456789",     "none"]
+Sign7BackBlockType = ["lapis_block",  "sea_lantern",    "sea_lantern"]
+Sign7EdgeBlockType = ["sea_lantern",  "glowstone",      "glowstone"]
+Sign7TextBlockType = ["gold_block",   "redstone_block", "redstone_block"]
 
 
 SphereRadius            = [5,             10,            20,           5,       10,      20,
