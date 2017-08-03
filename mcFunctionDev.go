@@ -3,7 +3,7 @@ package main
 import (
 	//"flag"
 	"fmt"
-	//"log"
+	"log"
 	"os"
 	"path"
 
@@ -61,17 +61,16 @@ func main() {
 	inputFile := "all.input"
 	basepath := path.Join(mcwpath.MCSavesDir, mcwpath.MCFunctionsDir)
 
-
 	//fmt.Println("basepath = " + basepath)
-	//err := BuildFalls(inputFile, basepath)
-	//if err != nil {
-	//	log.Fatalln(err)
-	//}
+	err := BuildFalls(inputFile, basepath)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	//CreateClearVolDriver(inputFile, basepath)
-	//CreateMWallDriver(inputFile, basepath)
+	CreateClearVolDriver(inputFile, basepath)
+	CreateMWallDriver(inputFile, basepath)
 	CreateSign7Driver(inputFile, basepath)
-	//CreateSphereDriver(inputFile, basepath)
-	//CreateWalkwayDriver(inputFile, basepath)
+	CreateSphereDriver(inputFile, basepath)
+	CreateWalkwayDriver(inputFile, basepath)
 }
 

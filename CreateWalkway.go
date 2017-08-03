@@ -44,7 +44,7 @@ func CreateWalkwayDriver(inputFile string, basepath string) {
 
 		// The first 4 values are for the straight walkways. The second 4 are for
 		// the angled walkways. The reason for choosing these values
-		//    "north", "east", "south_ew", "west_sn"
+		//    "north", "east", "south", "west"
 		// for the angled walkways is that these are the 4 orientations that are
 		// only rotations, they do not include reflections. See box.go for an
 		// understanding of this.
@@ -52,7 +52,7 @@ func CreateWalkwayDriver(inputFile string, basepath string) {
 		// around the centerline, but we cannot have relections for the angled walkways
 		// because they are at an angle to the centerline.
 		directionValues := []string{"north", "east", "south", "west",
-			"north", "east", "south_ew", "west_sn"}
+			"north", "east", "south", "west"}
 		directionNames := []string{"N", "E", "S", "W", "NW", "NE", "SE", "SW"}
 
 		for i := 0; i < dim; i++ {

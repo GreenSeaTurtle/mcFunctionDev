@@ -79,8 +79,8 @@ func CreateMWallDriver(inputFile string, basepath string) {
 	ndirvals := 8
 	filename := make([]string, maxdim*ndirvals)
 	filename_rm := make([]string, maxdim*ndirvals)
-	directionValues := []string{"north", "north_ew", "east", "east_sn", "south",
-		 "south_ew", "west", "west_sn"}
+	directionValues := []string{"north", "north_refl", "east", "east_refl", "south_refl",
+		 "south", "west_refl", "west"}
 	directionNames := []string{"NWE", "NEW", "ENS", "ESN", "SWE", "SEW", "WNS", "WSN"}
 	for i := 0; i < maxdim; i++ {
 		for j := 0; j < ndirvals; j++ {

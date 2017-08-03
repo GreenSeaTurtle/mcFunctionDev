@@ -32,7 +32,7 @@ func TestSouthBox(t *testing.T) {
 		WithCorner1(XYZ{X: 1, Y: 2, Z: 3}),
 		WithCorner2(XYZ{X: 4, Y: 5, Z: 6}))
 
-	b.Orient("south")
+	b.Orient("south_refl")
 
 	var buf bytes.Buffer
 	if err := b.WriteShape(&buf); err != nil {
@@ -70,7 +70,7 @@ func TestWestBox(t *testing.T) {
 		WithCorner1(XYZ{X: 1, Y: 2, Z: 3}),
 		WithCorner2(XYZ{X: 4, Y: 5, Z: 6}))
 
-	b.Orient("west")
+	b.Orient("west_refl")
 
 	var buf bytes.Buffer
 	if err := b.WriteShape(&buf); err != nil {

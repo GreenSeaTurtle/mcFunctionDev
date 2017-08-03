@@ -93,6 +93,12 @@ func At(xyz XYZ) BoxOption {
 // At some point in the future we may want to implement general rotations
 // and see if they are useful.
 
+// I am amazed that the syntax below of setting 4 values in two lines
+// actually works. It must copy the 4 original values to tmps and then
+// set the new values from the tmps. Doing the 4 operations
+// sequentially with no tmp values would, in some cases, lead to
+// incorrect values.
+
 func (b *Box) Orient(direction string) {
 	switch direction {
 	// No rotation required
@@ -100,14 +106,9 @@ func (b *Box) Orient(direction string) {
 	case "north":
 		return
 
-	// I am amazed that the syntax below of setting 4 values in two lines
-	// actually works. It must copy the 4 original values to tmps and then
-	// set the new values from the tmps. Doing the 4 operations sequentially
-	// with no tmp values would, in some cases, lead to incorrect values.
-
 	// No rotation required, but reflect about Z
 	// runs east to west
-	case "north_ew":
+	case "north_refl":
 		b.corner1.X, b.corner2.X = -b.corner1.X, -b.corner2.X
 
 
@@ -119,33 +120,33 @@ func (b *Box) Orient(direction string) {
 
 	// 270 ( or -90) degree rotation followed by a reflection about X
 	// runs south to north
-	case "east_sn":
+	case "east_refl":
 		b.corner1.X, b.corner2.X, b.corner1.Z, b.corner2.Z =
 			-b.corner1.Z, -b.corner2.Z, b.corner1.X, b.corner2.X
 		b.corner1.Z, b.corner2.Z = -b.corner1.Z, -b.corner2.Z
 
 	// 180 ( or -180) degree rotation
 	// runs east to west
-	case "south_ew":
+	case "south":
 		b.corner1.X, b.corner2.X, b.corner1.Z, b.corner2.Z =
 			-b.corner1.X, -b.corner2.X, -b.corner1.Z, -b.corner2.Z
 
 	// 180 ( or -180) degree rotation followed by a reflection about Z
 	// runs west to east
-	case "south":
+	case "south_refl":
 		b.corner1.X, b.corner2.X, b.corner1.Z, b.corner2.Z =
 			-b.corner1.X, -b.corner2.X, -b.corner1.Z, -b.corner2.Z
 		b.corner1.X, b.corner2.X = -b.corner1.X, -b.corner2.X
 
 	// 90 ( or -270) degree rotation
 	// runs south to north
-	case "west_sn":
+	case "west":
 		b.corner1.X, b.corner2.X, b.corner1.Z, b.corner2.Z =
 			b.corner1.Z, b.corner2.Z, -b.corner1.X, -b.corner2.X
 
 	// 90 ( or -270) degree rotation followed by a reflection about X
 	// runs north to south
-	case "west":
+	case "west_refl":
 		b.corner1.X, b.corner2.X, b.corner1.Z, b.corner2.Z =
 			b.corner1.Z, b.corner2.Z, -b.corner1.X, -b.corner2.X
 		b.corner1.Z, b.corner2.Z = -b.corner1.Z, -b.corner2.Z

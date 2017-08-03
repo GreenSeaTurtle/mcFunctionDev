@@ -116,7 +116,7 @@ func CreateSign7Driver(inputFile string, basepath string) {
 	ndirvals := 4
 	filename := make([]string, maxdim*ndirvals)
 	filename_rm := make([]string, maxdim*ndirvals)
-	directionValues := []string{"north", "east", "south_ew", "west_sn"}
+	directionValues := []string{"north", "east", "south", "west"}
 	directionNames := []string{"N", "E", "S", "W"}
 	for i := 0; i < maxdim; i++ {
 		index_str := fmt.Sprintf("%d", i)
@@ -268,11 +268,11 @@ func CreateSign7(basepath string, filename string, filename_rm string, direction
 	for i := 0; i < nlines_inp; i++ {
 		if text_inp_arr[i] != "none" {
 			nblocks_text[i] = GetNblocksInString(text_inp_arr[i])
-			fmt.Println("i=",i, "  nblocks_text[i]=",nblocks_text[i])
+			//fmt.Println("i=",i, "  nblocks_text[i]=",nblocks_text[i])
 			nlines_text++
 		}
 	}
-	fmt.Println("nlines_text=",nlines_text)	
+	//fmt.Println("nlines_text=",nlines_text)	
 
 	// Calculate the number of blocks for the total width of the sign.
 	//     nblocks_text1       Number of blocks needed for the characters
@@ -288,7 +288,7 @@ func CreateSign7(basepath string, filename string, filename_rm string, direction
 			}
 		}
 	}
-	fmt.Println("width_tot = ", width_tot)
+	//fmt.Println("width_tot = ", width_tot)
 
 	// Calculate the starting block X coordinate for each line of text.
 	// Currently every line of text is centered.

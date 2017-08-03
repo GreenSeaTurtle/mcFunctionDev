@@ -65,8 +65,8 @@ func BuildFalls(inputFile string, basepath string) error {
 		filename := make([]string, maxdim*ndirvals)
 		filename_rm := make([]string, maxdim*ndirvals)
 		filename_cfw := make([]string, maxdim*ndirvals)
-		directionValues := []string{"north", "north_ew", "east", "east_sn", "south",
-			"south_ew", "west", "west_sn"}
+		directionValues := []string{"north", "north_refl", "east", "east_refl", "south_refl",
+			"south", "west_refl", "west"}
 		directionNames := []string{"NWE", "NEW", "ENS", "ESN", "SWE", "SEW", "WNS", "WSN"}
 		for i := 0; i < maxdim; i++ {
 			for j := 0; j < ndirvals; j++ {
@@ -406,14 +406,14 @@ func BuildRollerCoasterFalls(basepath string) error {
 		return fmt.Errorf("build waterfall rc north fall: %v", err)
 	}
 
-	// Build the south fall - faces north, runs west to east.
+	// Build the south fall with reflection - faces north, runs west to east.
 	// The north and south falls are -1 blocks apart and so they share the same blocks for
 	// the front of the basin. In fact, the south falls overwrites what the north falls
 	// for the front of the basin.
 	// This ends up producing two sheets of water, one block apart. The roller coaster
 	// goes between those sheets.
 	origin = mcshapes.XYZ{X: 2, Y: 0, Z: 2}
-	direction = "south"
+	direction = "south_refl"
 	obj = mcshapes.NewMCObject(mcshapes.WithOrientation(direction))
 	wf = CreateWaterfall(origin, obj)
 	err = mcshapes.WriteShapes(f, wf)
